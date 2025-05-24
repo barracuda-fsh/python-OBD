@@ -29,7 +29,7 @@
 # along with python-OBD.  If not, see <http://www.gnu.org/licenses/>.  #
 #                                                                      #
 ########################################################################
-import time
+
 import math
 import functools
 from .utils import *
@@ -389,7 +389,6 @@ def fuel_type(messages):
 
 
 def parse_dtc(_bytes):
-
     """ converts 2 bytes into a DTC code """
 
     # check validity (also ignores padding that the ELM returns)
@@ -411,15 +410,9 @@ def parse_dtc(_bytes):
     return (dtc, DTC.get(dtc, ""))
 
 
-def hex_to_int(str):
-    i = eval("0x" + str, {}, {})
-    return i
-
-
 def single_dtc(messages):
     """ parses a single DTC from a message """
     d = messages[0].data[2:]
-    #d = messages[0].data[1:3]
     return parse_dtc(d)
 
 
@@ -427,29 +420,17 @@ def dtc(messages):
     """ converts a frame of 2-byte DTCs into a list of DTCs """
     codes = []
     d = []
-    print("len messages == ",len(messages))
-
     for message in messages:
+        d += message.data[2:]  # remove the mode and DTC_count bytes
 
-        print("len data == ", len(message.data))
-        #  # remove the mode and DTC_count bytes
-        if message.can == False:
-            d += message.data[2:]
-        elif message.can and message.num_frames == 1:
-            d += message.data[1:]  # remove the mode and DTC_count bytes
-        elif message.can and message.num_frames > 1:
-            d += message.data[0:]  # remove the mode and DTC_count bytes
-    print(d)
-    print(len(d))
     # look at data in pairs of bytes
     # looping through ENDING indices to avoid odd (invalid) code lengths
-
     for n in range(1, len(d), 2):
-        # parse the code
-        dtc = parse_dtc([d[n-1],d[n]])
 
-        if (dtc is not None) and (dtc[0] != "P0000"):
-            print(dtc)
+        # parse the code
+        dtc = parse_dtc((d[n - 1], d[n]))
+
+        if dtc is not None:
             codes.append(dtc)
 
     return codes

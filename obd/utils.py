@@ -154,8 +154,8 @@ def try_port(portStr):
         s.close()  # explicit close 'cause of delayed GC in java
         return True
 
-    except serial.SerialException as err:
-        logging.error(err)
+    except serial.SerialException:
+        pass
     except OSError as e:
         if e.errno != errno.ENOENT:  # permit "no such file or directory" errors
             raise e
@@ -172,20 +172,15 @@ def scan_serial():
     if sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
         possible_ports += glob.glob("/dev/rfcomm[0-9]*")
         possible_ports += glob.glob("/dev/ttyUSB[0-9]*")
-        possible_ports += glob.glob("/dev/ttyS[0-9]*")
-        possible_ports += glob.glob("/dev/ttyACM[0-9]*")
-        #possible_ports += glob.glob("/dev/pts/[0-9]*")  # for obdsim
-        
+
     elif sys.platform.startswith('win'):
-        #possible_ports += ["\\.\COM%d" % i for i in range(256)]  # on win, the pseudo ports are also COM - harder to distinguish
-        possible_ports += ["COM%d" % i for i in range(256)]  # on win, the pseudo ports are also COM - harder to distinguish
+        possible_ports += [r"\\.\COM%d" % i for i in range(256)]
 
     elif sys.platform.startswith('darwin'):
         exclude = [
             '/dev/tty.Bluetooth-Incoming-Port',
             '/dev/tty.Bluetooth-Modem'
         ]
-        #possible_ports += glob.glob("/dev/ttys00[0-9]*")  # for obdsim
         possible_ports += [port for port in glob.glob('/dev/tty.*') if port not in exclude]
 
     # possible_ports += glob.glob('/dev/pts/[0-9]*') # for obdsim
@@ -193,5 +188,5 @@ def scan_serial():
     for port in possible_ports:
         if try_port(port):
             available.append(port)
-    print('Available ports: '+str(available))
+
     return available
