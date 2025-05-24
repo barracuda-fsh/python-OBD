@@ -174,7 +174,7 @@ def scan_serial():
         possible_ports += glob.glob("/dev/ttyUSB[0-9]*")
         possible_ports += glob.glob("/dev/ttyS[0-9]*")
         possible_ports += glob.glob("/dev/ttyACM[0-9]*")
-        possible_ports += glob.glob("/dev/pts/[0-9]*")  # for obdsim
+        #possible_ports += glob.glob("/dev/pts/[0-9]*")  # for obdsim
         
     elif sys.platform.startswith('win'):
         #possible_ports += ["\\.\COM%d" % i for i in range(256)]  # on win, the pseudo ports are also COM - harder to distinguish

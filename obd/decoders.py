@@ -418,8 +418,8 @@ def hex_to_int(str):
 
 def single_dtc(messages):
     """ parses a single DTC from a message """
-    #d = messages[0].data[2:]
-    d = messages[0].data[1:3]
+    d = messages[0].data[2:]
+    #d = messages[0].data[1:3]
     return parse_dtc(d)
 
 
@@ -433,10 +433,11 @@ def dtc(messages):
 
         print("len data == ", len(message.data))
         #  # remove the mode and DTC_count bytes
-
-        if message.num_frames == 1:
+        if message.can == False:
+            d += message.data[2:]
+        elif message.can and message.num_frames == 1:
             d += message.data[1:]  # remove the mode and DTC_count bytes
-        else:
+        elif message.can and message.num_frames > 1:
             d += message.data[0:]  # remove the mode and DTC_count bytes
     print(d)
     print(len(d))
