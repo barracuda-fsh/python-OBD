@@ -173,6 +173,7 @@ class CANProtocol(Protocol):
         frames = message.frames
         print("How many frames? ", len(frames))
         message.num_frames = len(frames)
+        message.can = True
         if (len(frames) >= 1) and (frames[0].type == self.FRAME_TYPE_SF):
             if len(frames) == 1:
                 frame = frames[0]
